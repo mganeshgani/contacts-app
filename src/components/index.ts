@@ -1,0 +1,8 @@
+export { ErrorBoundary } from './ErrorBoundary';
+export { ContactCard } from './ContactCard';
+export { StatsBar } from './StatsBar';
+export { ColumnMapperModal } from './ColumnMapperModal';
+export { DuplicateSummaryModal } from './DuplicateSummaryModal';
+export { PermissionGate } from './PermissionGate';
+export { EmptyState } from './EmptyState';
+export { EditContactModal } from './EditContactModal';
