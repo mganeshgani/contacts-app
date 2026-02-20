@@ -3,6 +3,12 @@
     "name": "ExcelContactImporter",
     "slug": "excel-contact-importer",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/84d8a972-7b83-491b-b40b-768e9cf4bfb6"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -33,6 +39,7 @@
       "package": "com.excelcontactimporter.app"
     },
     "plugins": [
+      "expo-updates",
       [
         "expo-contacts",
         {
