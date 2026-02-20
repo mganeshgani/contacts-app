@@ -22,7 +22,7 @@ import {
   EditContactModal,
   EmptyState,
 } from '../components';
-import { COLORS, LIST_ITEM_HEIGHT } from '../constants';
+import { COLORS, LIST_ITEM_HEIGHT, RADIUS, SHADOWS } from '../constants';
 import { hasRequiredMappings } from '../utils/fileParser';
 import { t } from '../i18n';
 
@@ -372,14 +372,14 @@ export function PreviewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   toolbar: {
     paddingHorizontal: 12,
     paddingTop: 4,
   },
   searchbar: {
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     elevation: 0,
     height: 44,
   },
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionBtn: {
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   listContent: {
     paddingBottom: 100,
@@ -406,14 +406,14 @@ const styles = StyleSheet.create({
     right: 16,
   },
   importButton: {
-    borderRadius: 12,
-    elevation: 6,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.lg,
   },
   importButtonLabel: {
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
   },
   importButtonContent: {
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
 });

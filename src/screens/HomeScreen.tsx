@@ -1,5 +1,5 @@
 /**
- * HomeScreen - Main upload screen with recent imports
+ * HomeScreen - Premium upload screen with gradient hero & recent imports
  */
 
 import React, { useEffect, useCallback } from 'react';
@@ -8,19 +8,19 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  Alert,
 } from 'react-native';
-import { Text, Button, Surface, FAB, Divider, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, Surface, ActivityIndicator } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList, ImportRecord } from '../types';
 import { useFilePicker } from '../hooks/useFilePicker';
 import { useContactsStore, useHistoryStore, useSettingsStore } from '../store';
-import { PermissionGate, EmptyState } from '../components';
-import { COLORS } from '../constants';
+import { PermissionGate, AppLogo } from '../components';
+import { COLORS, SHADOWS, RADIUS } from '../constants';
 import { t } from '../i18n';
 import Toast from 'react-native-toast-message';
 
@@ -91,13 +91,16 @@ export function HomeScreen() {
 
       return (
         <Surface
-          style={[styles.recordCard, isDark && { backgroundColor: COLORS.surfaceDark }]}
-          elevation={1}
+          style={[
+            styles.recordCard,
+            isDark && { backgroundColor: COLORS.surfaceDark },
+          ]}
+          elevation={0}
         >
-          <View style={styles.recordIcon}>
+          <View style={[styles.recordIcon, isDark && { backgroundColor: 'rgba(5,150,105,0.15)' }]}>
             <MaterialCommunityIcons
               name="file-check-outline"
-              size={28}
+              size={24}
               color={COLORS.success}
             />
           </View>
@@ -109,31 +112,42 @@ export function HomeScreen() {
             >
               {item.fileName}
             </Text>
-            <Text variant="bodySmall" style={styles.recordDate}>
+            <Text
+              variant="bodySmall"
+              style={[styles.recordDate, isDark && { color: COLORS.textSecondaryDark }]}
+            >
               {dateStr}
             </Text>
             <View style={styles.recordStats}>
-              <Text variant="labelSmall" style={[styles.recordStat, { color: COLORS.success }]}>
-                {item.imported} {t('imported', lang)}
-              </Text>
-              {item.skipped > 0 && (
-                <Text variant="labelSmall" style={[styles.recordStat, { color: COLORS.warning }]}>
-                  {item.skipped} {t('skipped', lang)}
+              <View style={[styles.statBadge, { backgroundColor: COLORS.successSoft }]}>
+                <Text variant="labelSmall" style={{ color: COLORS.success, fontWeight: '700' }}>
+                  {item.imported} {t('imported', lang)}
                 </Text>
+              </View>
+              {item.skipped > 0 && (
+                <View style={[styles.statBadge, { backgroundColor: COLORS.warningSoft }]}>
+                  <Text variant="labelSmall" style={{ color: COLORS.warning, fontWeight: '700' }}>
+                    {item.skipped} {t('skipped', lang)}
+                  </Text>
+                </View>
               )}
               {item.failed > 0 && (
-                <Text variant="labelSmall" style={[styles.recordStat, { color: COLORS.error }]}>
-                  {item.failed} {t('failed', lang)}
-                </Text>
+                <View style={[styles.statBadge, { backgroundColor: COLORS.errorSoft }]}>
+                  <Text variant="labelSmall" style={{ color: COLORS.error, fontWeight: '700' }}>
+                    {item.failed} {t('failed', lang)}
+                  </Text>
+                </View>
               )}
             </View>
           </View>
           {item.canUndo && (
-            <MaterialCommunityIcons
-              name="undo-variant"
-              size={20}
-              color={COLORS.textSecondary}
-            />
+            <View style={styles.undoIndicator}>
+              <MaterialCommunityIcons
+                name="undo-variant"
+                size={18}
+                color={COLORS.primaryLight}
+              />
+            </View>
           )}
         </Surface>
       );
@@ -144,23 +158,24 @@ export function HomeScreen() {
   const renderHeader = useCallback(
     () => (
       <View style={styles.headerSection}>
-        {/* Hero Section */}
-        <View style={styles.hero}>
-          <MaterialCommunityIcons
-            name="file-excel-outline"
-            size={72}
-            color={COLORS.primary}
-          />
-          <Text
-            variant="headlineMedium"
-            style={[styles.heroTitle, isDark && { color: COLORS.textDark }]}
-          >
+        {/* Premium Gradient Hero */}
+        <LinearGradient
+          colors={isDark ? [...COLORS.gradientHeroDark] : [...COLORS.gradientHero]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.hero, { paddingTop: insets.top + 20 }]}
+        >
+          {/* Decorative circles */}
+          <View style={[styles.heroBgCircle, styles.heroBgCircle1]} />
+          <View style={[styles.heroBgCircle, styles.heroBgCircle2]} />
+          <View style={[styles.heroBgCircle, styles.heroBgCircle3]} />
+
+          <AppLogo size="lg" showText={false} isDark />
+
+          <Text style={styles.heroTitle}>
             {t('welcomeTitle', lang)}
           </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.heroSubtitle, isDark && { color: COLORS.textSecondaryDark }]}
-          >
+          <Text style={styles.heroSubtitle}>
             {t('welcomeSubtitle', lang)}
           </Text>
 
@@ -173,23 +188,81 @@ export function HomeScreen() {
             style={styles.uploadButton}
             labelStyle={styles.uploadButtonLabel}
             contentStyle={styles.uploadButtonContent}
+            buttonColor="#FFFFFF"
+            textColor={COLORS.primary}
           >
             {isPickingFile ? t('loading', lang) : t('uploadButton', lang)}
           </Button>
-        </View>
 
-        <Divider style={styles.divider} />
+          {/* Supported formats */}
+          <View style={styles.formatsRow}>
+            {[
+              { icon: 'file-excel', label: '.xlsx' },
+              { icon: 'file-excel-outline', label: '.xls' },
+              { icon: 'file-delimited', label: '.csv' },
+            ].map((fmt) => (
+              <View key={fmt.label} style={styles.formatChip}>
+                <MaterialCommunityIcons
+                  name={fmt.icon as any}
+                  size={14}
+                  color="rgba(255,255,255,0.7)"
+                />
+                <Text style={styles.formatLabel}>{fmt.label}</Text>
+              </View>
+            ))}
+          </View>
+        </LinearGradient>
+
+        {/* Quick Stats Strip */}
+        {records.length > 0 && (
+          <View style={styles.quickStats}>
+            <View style={[styles.quickStatCard, isDark && { backgroundColor: COLORS.surfaceDark }]}>
+              <Text style={[styles.quickStatValue, { color: COLORS.primary }]}>
+                {records.length}
+              </Text>
+              <Text style={[styles.quickStatLabel, isDark && { color: COLORS.textSecondaryDark }]}>
+                Imports
+              </Text>
+            </View>
+            <View style={[styles.quickStatCard, isDark && { backgroundColor: COLORS.surfaceDark }]}>
+              <Text style={[styles.quickStatValue, { color: COLORS.success }]}>
+                {records.reduce((sum, r) => sum + r.imported, 0)}
+              </Text>
+              <Text style={[styles.quickStatLabel, isDark && { color: COLORS.textSecondaryDark }]}>
+                Contacts
+              </Text>
+            </View>
+            <View style={[styles.quickStatCard, isDark && { backgroundColor: COLORS.surfaceDark }]}>
+              <Text style={[styles.quickStatValue, { color: COLORS.secondary }]}>
+                {records.reduce((sum, r) => sum + r.totalRows, 0)}
+              </Text>
+              <Text style={[styles.quickStatLabel, isDark && { color: COLORS.textSecondaryDark }]}>
+                Rows
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Recent Imports Header */}
-        <Text
-          variant="titleMedium"
-          style={[styles.sectionTitle, isDark && { color: COLORS.textDark }]}
-        >
-          {t('recentImports', lang)}
-        </Text>
+        <View style={styles.sectionHeaderRow}>
+          <Text
+            variant="titleMedium"
+            style={[styles.sectionTitle, isDark && { color: COLORS.textDark }]}
+          >
+            {t('recentImports', lang)}
+          </Text>
+          {records.length > 0 && (
+            <Text
+              variant="labelSmall"
+              style={{ color: COLORS.primaryLight, fontWeight: '600' }}
+            >
+              {records.length} {records.length === 1 ? 'import' : 'imports'}
+            </Text>
+          )}
+        </View>
       </View>
     ),
-    [isDark, lang, handleUpload, isPickingFile]
+    [isDark, lang, handleUpload, isPickingFile, records, insets.top]
   );
 
   return (
@@ -198,7 +271,6 @@ export function HomeScreen() {
         style={[
           styles.container,
           isDark && { backgroundColor: COLORS.backgroundDark },
-          { paddingTop: insets.top },
         ]}
       >
         <FlatList
@@ -209,13 +281,24 @@ export function HomeScreen() {
           ListEmptyComponent={
             historyLoaded ? (
               <View style={styles.emptyHistory}>
-                <MaterialCommunityIcons
-                  name="history"
-                  size={40}
-                  color={COLORS.textSecondary}
-                />
-                <Text variant="bodyMedium" style={styles.emptyHistoryText}>
+                <View style={[styles.emptyIconCircle, isDark && { backgroundColor: COLORS.surfaceDark }]}>
+                  <MaterialCommunityIcons
+                    name="history"
+                    size={36}
+                    color={isDark ? COLORS.textSecondaryDark : COLORS.textSecondary}
+                  />
+                </View>
+                <Text
+                  variant="bodyMedium"
+                  style={[styles.emptyHistoryText, isDark && { color: COLORS.textSecondaryDark }]}
+                >
                   {t('noRecentImports', lang)}
+                </Text>
+                <Text
+                  variant="bodySmall"
+                  style={[styles.emptyHistoryHint, isDark && { color: COLORS.textSecondaryDark }]}
+                >
+                  Upload a file to get started
                 </Text>
               </View>
             ) : (
@@ -224,7 +307,12 @@ export function HomeScreen() {
           }
           contentContainerStyle={styles.listContent}
           refreshControl={
-            <RefreshControl refreshing={false} onRefresh={loadHistory} />
+            <RefreshControl
+              refreshing={false}
+              onRefresh={loadHistory}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+            />
           }
           showsVerticalScrollIndicator={false}
         />
@@ -236,69 +324,148 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   listContent: {
     paddingBottom: 100,
   },
   headerSection: {
-    paddingBottom: 8,
+    paddingBottom: 4,
   },
+
+  // Hero
   hero: {
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 24,
+    paddingBottom: 28,
+    overflow: 'hidden',
+  },
+  heroBgCircle: {
+    position: 'absolute',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  heroBgCircle1: {
+    width: 250,
+    height: 250,
+    top: -60,
+    right: -40,
+  },
+  heroBgCircle2: {
+    width: 180,
+    height: 180,
+    bottom: -30,
+    left: -40,
+  },
+  heroBgCircle3: {
+    width: 100,
+    height: 100,
+    top: 80,
+    left: 50,
   },
   heroTitle: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FFFFFF',
     marginTop: 16,
     textAlign: 'center',
   },
   heroSubtitle: {
-    color: '#64748B',
+    color: 'rgba(255,255,255,0.7)',
     marginTop: 8,
     textAlign: 'center',
     lineHeight: 22,
     maxWidth: 320,
+    fontSize: 14,
   },
   uploadButton: {
-    marginTop: 24,
-    borderRadius: 12,
-    elevation: 4,
+    marginTop: 20,
+    borderRadius: RADIUS.lg,
   },
   uploadButtonLabel: {
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
   },
   uploadButtonContent: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
   },
-  divider: {
-    marginHorizontal: 24,
+  formatsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
   },
-  sectionTitle: {
+  formatChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: RADIUS.full,
+  },
+  formatLabel: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
     fontWeight: '600',
-    color: '#1E293B',
+  },
+
+  // Quick Stats
+  quickStats: {
+    flexDirection: 'row',
+    marginHorizontal: 12,
+    marginTop: -16,
+    gap: 8,
+  },
+  quickStatCard: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    paddingVertical: 12,
+    alignItems: 'center',
+    ...SHADOWS.md,
+  },
+  quickStatValue: {
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  quickStatLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+
+  // Section header
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 8,
   },
+  sectionTitle: {
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+
+  // Record Cards
   recordCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 14,
     marginHorizontal: 12,
-    marginVertical: 4,
-    borderRadius: 12,
+    marginVertical: 5,
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    ...SHADOWS.sm,
   },
   recordIcon: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F0FDF4',
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.successSoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -307,29 +474,55 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   recordTitle: {
-    fontWeight: '600',
-    color: '#1E293B',
+    fontWeight: '700',
+    color: COLORS.text,
   },
   recordDate: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   recordStats: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 4,
+    gap: 6,
+    marginTop: 6,
+    flexWrap: 'wrap',
   },
-  recordStat: {
-    fontSize: 11,
-    fontWeight: '600',
+  statBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: RADIUS.full,
   },
+  undoIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Empty state
   emptyHistory: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingVertical: 40,
+  },
+  emptyIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: COLORS.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   emptyHistoryText: {
-    color: '#64748B',
-    marginTop: 8,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+  emptyHistoryHint: {
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    fontSize: 13,
   },
   loader: {
     paddingVertical: 32,

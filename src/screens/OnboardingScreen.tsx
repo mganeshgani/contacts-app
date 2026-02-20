@@ -1,5 +1,5 @@
 /**
- * OnboardingScreen - First-time user tutorial
+ * OnboardingScreen - Premium first-time user tutorial
  */
 
 import React, { useState, useCallback, useRef } from 'react';
@@ -9,17 +9,19 @@ import {
   FlatList,
   Dimensions,
   ViewToken,
+  Animated,
 } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import type { RootStackParamList } from '../types';
 import { useSettingsStore } from '../store';
 import { setOnboardingComplete } from '../services/storageService';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { t } from '../i18n';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -30,7 +32,8 @@ interface OnboardingSlide {
   icon: string;
   titleKey: 'onboardingTitle1' | 'onboardingTitle2' | 'onboardingTitle3';
   descKey: 'onboardingDesc1' | 'onboardingDesc2' | 'onboardingDesc3';
-  color: string;
+  gradient: readonly [string, string];
+  accentIcon: string;
 }
 
 const SLIDES: OnboardingSlide[] = [
@@ -38,19 +41,22 @@ const SLIDES: OnboardingSlide[] = [
     icon: 'file-excel-outline',
     titleKey: 'onboardingTitle1',
     descKey: 'onboardingDesc1',
-    color: COLORS.primary,
+    gradient: COLORS.gradientPrimary,
+    accentIcon: 'file-upload',
   },
   {
     icon: 'account-search-outline',
     titleKey: 'onboardingTitle2',
     descKey: 'onboardingDesc2',
-    color: COLORS.secondary,
+    gradient: COLORS.gradientSecondary,
+    accentIcon: 'shield-check',
   },
   {
     icon: 'shield-check-outline',
     titleKey: 'onboardingTitle3',
     descKey: 'onboardingDesc3',
-    color: COLORS.success,
+    gradient: COLORS.gradientSuccess,
+    accentIcon: 'rocket-launch',
   },
 ];
 
@@ -92,17 +98,34 @@ export function OnboardingScreen() {
 
   const renderSlide = ({ item }: { item: OnboardingSlide }) => (
     <View style={[styles.slide, { width: SCREEN_WIDTH }]}>
-      <View style={[styles.iconCircle, { backgroundColor: item.color + '15' }]}>
-        <MaterialCommunityIcons
-          name={item.icon as any}
-          size={80}
-          color={item.color}
-        />
+      <View style={styles.iconSection}>
+        <LinearGradient
+          colors={[...item.gradient]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.iconCircle}
+        >
+          {/* Glass overlay */}
+          <View style={styles.iconGlass} />
+          <MaterialCommunityIcons
+            name={item.icon as any}
+            size={64}
+            color="#FFFFFF"
+          />
+        </LinearGradient>
+        {/* Floating accent icon */}
+        <View style={styles.floatingAccent}>
+          <MaterialCommunityIcons
+            name={item.accentIcon as any}
+            size={20}
+            color={item.gradient[0]}
+          />
+        </View>
       </View>
-      <Text variant="headlineMedium" style={styles.slideTitle}>
+      <Text style={styles.slideTitle}>
         {t(item.titleKey, lang)}
       </Text>
-      <Text variant="bodyLarge" style={styles.slideDesc}>
+      <Text style={styles.slideDesc}>
         {t(item.descKey, lang)}
       </Text>
     </View>
@@ -111,10 +134,18 @@ export function OnboardingScreen() {
   const isLast = activeIndex === SLIDES.length - 1;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <LinearGradient
+      colors={['#FFFFFF', '#F0F4FF']}
+      style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
+    >
       <View style={styles.skipContainer}>
         {!isLast && (
-          <Button mode="text" onPress={handleComplete} compact>
+          <Button
+            mode="text"
+            onPress={handleComplete}
+            compact
+            textColor={COLORS.textSecondary}
+          >
             Skip
           </Button>
         )}
@@ -133,39 +164,49 @@ export function OnboardingScreen() {
         bounces={false}
       />
 
-      {/* Dots */}
+      {/* Premium Dots */}
       <View style={styles.dots}>
-        {SLIDES.map((_, index) => (
+        {SLIDES.map((slide, index) => (
           <View
             key={index}
             style={[
               styles.dot,
-              index === activeIndex && styles.dotActive,
+              index === activeIndex && [
+                styles.dotActive,
+                { backgroundColor: slide.gradient[0] },
+              ],
             ]}
           />
         ))}
       </View>
 
-      {/* Next/Get Started */}
+      {/* Premium Button */}
       <View style={styles.buttonContainer}>
-        <Button
-          mode="contained"
-          onPress={handleNext}
-          style={styles.nextButton}
-          labelStyle={styles.nextButtonLabel}
-          contentStyle={styles.nextButtonContent}
+        <LinearGradient
+          colors={[...SLIDES[activeIndex].gradient]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.gradientButton}
         >
-          {isLast ? t('getStarted', lang) : t('next', lang)}
-        </Button>
+          <Button
+            mode="text"
+            onPress={handleNext}
+            labelStyle={styles.nextButtonLabel}
+            contentStyle={styles.nextButtonContent}
+            textColor="#FFFFFF"
+            icon={isLast ? 'rocket-launch' : 'arrow-right'}
+          >
+            {isLast ? t('getStarted', lang) : t('next', lang)}
+          </Button>
+        </LinearGradient>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   skipContainer: {
     alignItems: 'flex-end',
@@ -179,24 +220,54 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 40,
   },
+  iconSection: {
+    marginBottom: 36,
+    position: 'relative',
+  },
   iconCircle: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    width: 140,
+    height: 140,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 32,
+    overflow: 'hidden',
+    ...SHADOWS.xl,
+  },
+  iconGlass: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    width: 100,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    transform: [{ rotate: '-15deg' }],
+  },
+  floatingAccent: {
+    position: 'absolute',
+    bottom: -4,
+    right: -4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.md,
   },
   slideTitle: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontSize: 26,
+    fontWeight: '800',
+    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 12,
   },
   slideDesc: {
-    color: '#64748B',
+    fontSize: 16,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
+    maxWidth: 300,
   },
   dots: {
     flexDirection: 'row',
@@ -205,28 +276,29 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#E2E8F0',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.border,
   },
   dotActive: {
-    backgroundColor: COLORS.primary,
     width: 28,
+    borderRadius: RADIUS.sm,
   },
   buttonContainer: {
     paddingHorizontal: 24,
     paddingBottom: 16,
   },
-  nextButton: {
-    borderRadius: 12,
-    elevation: 4,
+  gradientButton: {
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    ...SHADOWS.lg,
   },
   nextButtonLabel: {
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
   },
   nextButtonContent: {
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
 });

@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import * as Haptics from 'expo-haptics';
@@ -17,7 +18,7 @@ import Toast from 'react-native-toast-message';
 import type { RootStackParamList } from '../types';
 import { useContactsStore, useHistoryStore, useSettingsStore } from '../store';
 import { useImport } from '../hooks/useImport';
-import { COLORS } from '../constants';
+import { COLORS, SHADOWS, RADIUS } from '../constants';
 import { t } from '../i18n';
 import { generateCSV, generateVCF } from '../utils/fileParser';
 
@@ -180,11 +181,18 @@ export function ImportSummaryScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Success/Error Icon */}
-        <MaterialCommunityIcons
-          name={isSuccess ? 'check-circle' : 'alert-circle'}
-          size={80}
-          color={isSuccess ? COLORS.success : COLORS.warning}
-        />
+        <LinearGradient
+          colors={isSuccess ? [...COLORS.gradientSuccess] : [COLORS.warning, COLORS.warningLight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.iconCircle}
+        >
+          <MaterialCommunityIcons
+            name={isSuccess ? 'check-circle' : 'alert-circle'}
+            size={48}
+            color="#FFFFFF"
+          />
+        </LinearGradient>
 
         <Text
           variant="headlineMedium"
@@ -336,17 +344,17 @@ const summaryStyles = StyleSheet.create({
   label: {
     flex: 1,
     marginLeft: 12,
-    color: '#1E293B',
+    color: COLORS.text,
   },
   value: {
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
     alignItems: 'center',
@@ -354,20 +362,29 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
   },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.xl,
+  },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
-    marginTop: 16,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginTop: 20,
   },
   subtitle: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 4,
   },
   statsCard: {
     width: '100%',
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     marginTop: 24,
     overflow: 'hidden',
+    ...SHADOWS.md,
   },
   rowDivider: {
     marginHorizontal: 16,
@@ -378,19 +395,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionButton: {
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   doneButton: {
     marginTop: 32,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     width: '100%',
-    elevation: 4,
+    ...SHADOWS.lg,
   },
   doneButtonLabel: {
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
   },
   doneButtonContent: {
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
 });

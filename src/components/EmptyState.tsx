@@ -6,7 +6,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS } from '../constants';
 import { useSettingsStore } from '../store';
 
 interface EmptyStateProps {
@@ -66,13 +66,13 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
     marginTop: 16,
     textAlign: 'center',
   },
   message: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 8,
     textAlign: 'center',
     lineHeight: 22,
@@ -80,6 +80,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
   },
 });

@@ -7,7 +7,7 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Button, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { usePermissions } from '../hooks/usePermissions';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 
@@ -102,37 +102,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   card: {
     padding: 32,
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     alignItems: 'center',
     maxWidth: 400,
     width: '100%',
+    ...SHADOWS.md,
   },
   title: {
     marginTop: 16,
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
     textAlign: 'center',
   },
   message: {
     marginTop: 8,
     textAlign: 'center',
-    color: '#64748B',
+    color: COLORS.textSecondary,
     lineHeight: 22,
   },
   button: {
     marginTop: 24,
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     paddingHorizontal: 16,
   },
   buttonLabel: {
-    fontWeight: '600',
+    fontWeight: '700',
   },
   loadingText: {
     marginTop: 12,
-    color: '#64748B',
+    color: COLORS.textSecondary,
   },
 });

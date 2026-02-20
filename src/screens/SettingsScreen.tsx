@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 
 import { useSettingsStore } from '../store';
 import { clearAllData } from '../services/storageService';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { t, Language } from '../i18n';
 
 export function SettingsScreen() {
@@ -108,7 +108,7 @@ export function SettingsScreen() {
     );
   }, [lang, resetSettings]);
 
-  const bgColor = isDark ? COLORS.backgroundDark : '#F8FAFC';
+  const bgColor = isDark ? COLORS.backgroundDark : COLORS.background;
   const cardBg = isDark ? COLORS.surfaceDark : COLORS.surface;
   const textColor = isDark ? COLORS.textDark : COLORS.text;
   const subtextColor = isDark ? COLORS.textSecondaryDark : COLORS.textSecondary;
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontWeight: '700',
+    fontWeight: '800',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -373,24 +373,26 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   sectionTitle: {
-    fontWeight: '600',
+    fontWeight: '700',
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 6,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
+    fontSize: 11,
   },
   section: {
     marginHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     overflow: 'hidden',
+    ...SHADOWS.sm,
   },
   settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   settingInfo: {
     flexDirection: 'row',
@@ -437,11 +439,11 @@ const styles = StyleSheet.create({
     maxWidth: 160,
   },
   customApplyBtn: {
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     alignSelf: 'center',
   },
   codeButton: {
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   footer: {
     paddingVertical: 24,

@@ -6,7 +6,7 @@ import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Modal, Portal, Text, TextInput, Button } from 'react-native-paper';
 import type { ContactRow } from '../types';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 import { validateName, validateEmail } from '../utils/validators';
@@ -182,15 +182,16 @@ export function EditContactModal({
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     margin: 20,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     maxHeight: '85%',
+    ...SHADOWS.lg,
   },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
     marginBottom: 16,
   },
   input: {
@@ -203,11 +204,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   button: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     minWidth: 100,
   },
   errorText: {
-    color: '#DC2626',
+    color: COLORS.error,
     marginTop: -8,
     marginBottom: 8,
     marginLeft: 4,

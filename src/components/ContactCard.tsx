@@ -7,7 +7,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Checkbox, Chip, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ContactRow, DuplicateAction } from '../types';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 
@@ -47,7 +47,7 @@ export const ContactCard = memo(function ContactCard({
   const bgColor = contact.isDuplicate
     ? COLORS.duplicateBg
     : !contact.isValid
-      ? '#FEE2E2'
+      ? COLORS.errorSoft
       : isDark
         ? COLORS.surfaceDark
         : COLORS.surface;
@@ -190,13 +190,14 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     marginHorizontal: 12,
     marginVertical: 4,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
   content: {
     flex: 1,
@@ -208,15 +209,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   name: {
-    fontWeight: '600',
-    color: '#1E293B',
+    fontWeight: '700',
+    color: COLORS.text,
     flex: 1,
   },
   nameDark: {
-    color: '#F1F5F9',
+    color: COLORS.textDark,
   },
   duplicateChip: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: COLORS.warningSoft,
     height: 24,
   },
   duplicateChipText: {
@@ -230,10 +231,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   detail: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
   },
   detailDark: {
-    color: '#94A3B8',
+    color: COLORS.textSecondaryDark,
   },
   errorRow: {
     flexDirection: 'row',
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   errorText: {
-    color: '#DC2626',
+    color: COLORS.error,
     fontSize: 12,
   },
   actionRow: {
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     height: 28,
   },
   actionChipActive: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: COLORS.primarySoft,
   },
   actionChipText: {
     fontSize: 11,

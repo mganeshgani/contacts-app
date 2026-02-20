@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#1E40AF"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.excelcontactimporter.app",
@@ -40,8 +42,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "84d8a972-7b83-491b-b40b-768e9cf4bfb6"
       }
-    }
+    },
+    "owner": "mganeshgani"
   }
 }

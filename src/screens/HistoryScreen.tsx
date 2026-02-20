@@ -13,7 +13,7 @@ import type { ImportRecord } from '../types';
 import { useHistoryStore, useSettingsStore } from '../store';
 import { useImport } from '../hooks/useImport';
 import { EmptyState } from '../components';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { t } from '../i18n';
 
 export function HistoryScreen() {
@@ -210,12 +210,12 @@ const badgeStyles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   value: {
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
   },
   label: {
     fontSize: 10,
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 1,
   },
 });
@@ -223,13 +223,13 @@ const badgeStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   headerTitle: {
-    fontWeight: '700',
+    fontWeight: '800',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    color: '#1E293B',
+    color: COLORS.text,
   },
   listContent: {
     paddingBottom: 24,
@@ -237,8 +237,9 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 12,
     marginVertical: 6,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     padding: 16,
+    ...SHADOWS.sm,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -249,11 +250,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fileName: {
-    fontWeight: '600',
-    color: '#1E293B',
+    fontWeight: '700',
+    color: COLORS.text,
   },
   dateText: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   statsRow: {
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   undoButton: {
     marginTop: 12,
     borderColor: COLORS.error,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     alignSelf: 'flex-start',
   },
   loader: {

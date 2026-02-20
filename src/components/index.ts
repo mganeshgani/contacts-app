@@ -6,3 +6,5 @@ export { DuplicateSummaryModal } from './DuplicateSummaryModal';
 export { PermissionGate } from './PermissionGate';
 export { EmptyState } from './EmptyState';
 export { EditContactModal } from './EditContactModal';
+export { AppLogo } from './AppLogo';
+export { SplashLoader } from './SplashLoader';

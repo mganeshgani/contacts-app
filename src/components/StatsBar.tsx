@@ -6,7 +6,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 
@@ -75,27 +75,28 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 8,
     marginHorizontal: 12,
     marginVertical: 8,
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.sm,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
   value: {
-    fontWeight: '700',
+    fontWeight: '800',
     marginTop: 2,
   },
   label: {
     fontSize: 10,
-    color: '#64748B',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: 1,
   },
   labelDark: {
-    color: '#94A3B8',
+    color: COLORS.textSecondaryDark,
   },
 });

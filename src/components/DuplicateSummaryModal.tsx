@@ -7,7 +7,7 @@ import { View, StyleSheet } from 'react-native';
 import { Modal, Portal, Text, Button, Surface, Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { DuplicateAction, DuplicateCheckResult } from '../types';
-import { COLORS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 import { t } from '../i18n';
 
@@ -172,30 +172,32 @@ export function DuplicateSummaryModal({
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     margin: 20,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
+    ...SHADOWS.lg,
   },
   icon: {
     alignSelf: 'center',
     marginBottom: 8,
   },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
     textAlign: 'center',
   },
   subtitle: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 16,
   },
   statsCard: {
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     padding: 16,
     marginBottom: 16,
+    ...SHADOWS.sm,
   },
   statRow: {
     flexDirection: 'row',
@@ -209,21 +211,21 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 48,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: COLORS.border,
   },
   statValue: {
-    fontWeight: '700',
+    fontWeight: '800',
     marginTop: 4,
-    color: '#1E293B',
+    color: COLORS.text,
   },
   statLabel: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   actionTitle: {
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 8,
-    color: '#1E293B',
+    color: COLORS.text,
   },
   bulkActions: {
     flexDirection: 'row',
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   actionButton: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
   },
   divider: {
     marginVertical: 16,
@@ -242,7 +244,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     minWidth: 100,
   },
 });

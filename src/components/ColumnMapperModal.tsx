@@ -7,8 +7,8 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { Modal, Portal, Text, Button, Surface, Chip } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ColumnMapping } from '../types';
-import { COLORS } from '../constants';
-import { useSettingsStore, useContactsStore } from '../store';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
+import { useSettingsStore } from '../store';
 import { hasRequiredMappings } from '../utils/fileParser';
 import { t } from '../i18n';
 
@@ -177,18 +177,19 @@ export function ColumnMapperModal({
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     margin: 16,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     maxHeight: '85%',
+    ...SHADOWS.lg,
   },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
   },
   subtitle: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 4,
     marginBottom: 16,
   },
@@ -202,17 +203,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fieldLabel: {
-    fontWeight: '600',
-    color: '#1E293B',
+    fontWeight: '700',
+    color: COLORS.text,
     flex: 1,
   },
   requiredChip: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: COLORS.errorSoft,
     height: 24,
   },
   requiredText: {
     fontSize: 10,
-    color: '#DC2626',
+    color: COLORS.error,
   },
   headerChips: {
     flexDirection: 'row',
@@ -223,13 +224,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   chipSelected: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: COLORS.primarySoft,
   },
   chipDisabled: {
     opacity: 0.4,
   },
   errorText: {
-    color: '#DC2626',
+    color: COLORS.error,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     minWidth: 100,
   },
 });

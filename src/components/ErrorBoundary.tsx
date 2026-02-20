@@ -6,6 +6,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS, RADIUS } from '../constants';
 
 interface Props {
   children: ReactNode;
@@ -47,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <MaterialCommunityIcons
               name="alert-circle-outline"
               size={64}
-              color="#DC2626"
+              color={COLORS.error}
             />
             <Text variant="headlineSmall" style={styles.title}>
               Something went wrong
@@ -77,28 +78,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   card: {
     padding: 32,
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     alignItems: 'center',
     maxWidth: 400,
     width: '100%',
   },
   title: {
     marginTop: 16,
-    fontWeight: '700',
-    color: '#1E293B',
+    fontWeight: '800',
+    color: COLORS.text,
   },
   message: {
     marginTop: 8,
     textAlign: 'center',
-    color: '#64748B',
+    color: COLORS.textSecondary,
     lineHeight: 22,
   },
   button: {
     marginTop: 24,
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
   },
 });

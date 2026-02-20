@@ -10,12 +10,13 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Progress from 'react-native-progress';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
 import type { RootStackParamList } from '../types';
 import { useContactsStore, useSettingsStore } from '../store';
 import { useImport } from '../hooks/useImport';
-import { COLORS } from '../constants';
+import { COLORS, SHADOWS, RADIUS } from '../constants';
 import { t } from '../i18n';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -99,11 +100,18 @@ export function ImportProgressScreen() {
       ]}
     >
       <View style={styles.center}>
-        <MaterialCommunityIcons
-          name="cloud-upload"
-          size={72}
-          color={COLORS.primary}
-        />
+        <LinearGradient
+          colors={isDark ? [...COLORS.gradientDark] : [...COLORS.gradientPrimary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.iconCircle}
+        >
+          <MaterialCommunityIcons
+            name="cloud-upload"
+            size={48}
+            color="#FFFFFF"
+          />
+        </LinearGradient>
 
         <Text
           variant="headlineMedium"
@@ -121,13 +129,13 @@ export function ImportProgressScreen() {
             width={null}
             height={12}
             borderRadius={6}
-            color={COLORS.primary}
-            unfilledColor={isDark ? COLORS.borderDark : '#E2E8F0'}
+            color={COLORS.primaryLight}
+            unfilledColor={isDark ? COLORS.borderDark : COLORS.border}
             borderWidth={0}
             style={styles.progressBar}
           />
           <Text
-            variant="titleMedium"
+            variant="titleLarge"
             style={[styles.progressText, isDark && { color: COLORS.textDark }]}
           >
             {Math.round(percentage * 100)}%
@@ -151,7 +159,7 @@ export function ImportProgressScreen() {
         {progress && (
           <Surface
             style={[styles.statsCard, isDark && { backgroundColor: COLORS.surfaceDark }]}
-            elevation={1}
+            elevation={0}
           >
             <View style={styles.statsGrid}>
               <StatItem
@@ -180,7 +188,7 @@ export function ImportProgressScreen() {
               />
             </View>
 
-            <View style={styles.totalRow}>
+            <View style={[styles.totalRow, isDark && { borderTopColor: COLORS.borderDark }]}>
               <Text
                 variant="bodySmall"
                 style={[styles.totalText, isDark && { color: COLORS.textSecondaryDark }]}
@@ -256,10 +264,10 @@ const statStyles = StyleSheet.create({
     flex: 1,
   },
   value: {
-    fontWeight: '700',
+    fontWeight: '800',
   },
   label: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
 });
@@ -267,7 +275,7 @@ const statStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
   center: {
     flex: 1,
@@ -275,10 +283,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
   },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.xl,
+  },
   title: {
-    fontWeight: '700',
-    color: '#1E293B',
-    marginTop: 16,
+    fontWeight: '800',
+    color: COLORS.text,
+    marginTop: 20,
     textAlign: 'center',
   },
   progressContainer: {
@@ -289,20 +305,21 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   progressText: {
-    fontWeight: '700',
+    fontWeight: '800',
     textAlign: 'center',
     marginTop: 8,
-    color: '#1E293B',
+    color: COLORS.text,
   },
   batchText: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
     marginTop: 4,
   },
   statsCard: {
     width: '100%',
-    borderRadius: 12,
+    borderRadius: RADIUS.lg,
     padding: 16,
     marginTop: 24,
+    ...SHADOWS.md,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -313,31 +330,31 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    borderTopColor: COLORS.border,
   },
   totalText: {
-    color: '#64748B',
+    color: COLORS.textSecondary,
   },
   errorSection: {
     width: '100%',
     marginTop: 16,
     padding: 12,
-    backgroundColor: '#FEF2F2',
-    borderRadius: 8,
+    backgroundColor: COLORS.errorSoft,
+    borderRadius: RADIUS.sm,
   },
   errorLabel: {
-    color: '#DC2626',
-    fontWeight: '600',
+    color: COLORS.error,
+    fontWeight: '700',
     marginBottom: 4,
   },
   errorText: {
-    color: '#DC2626',
+    color: COLORS.error,
     marginTop: 2,
   },
   cancelButton: {
     marginTop: 32,
     borderColor: COLORS.error,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   loader: {
     marginTop: 32,

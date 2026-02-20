@@ -65,14 +65,19 @@ function MainTabs() {
         tabBarStyle: {
           backgroundColor: isDark ? COLORS.surfaceDark : COLORS.surface,
           borderTopColor: isDark ? COLORS.borderDark : COLORS.border,
-          elevation: 8,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 4,
+          elevation: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 6,
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontWeight: '700',
+          letterSpacing: 0.3,
         },
       }}
     >
