@@ -13,12 +13,13 @@ import type {
   AppSettings,
   DuplicateAction,
   DuplicateCheckResult,
+  BackupRecord,
 } from '../types';
 import { DEFAULT_SETTINGS } from '../types';
 import { mapRawRowToContact } from '../utils/validators';
 import { autoDetectColumns, hasRequiredMappings } from '../utils/fileParser';
 import { checkDuplicates, getAllDeviceContacts, buildPhoneLookupMap } from '../services/contactsService';
-import { loadSettings, saveSettings, loadImportHistory, saveImportRecord } from '../services/storageService';
+import { loadSettings, saveSettings, loadImportHistory, saveImportRecord, loadBackupHistory, saveBackupRecord, deleteBackupRecord } from '../services/storageService';
 
 // ─── Contacts Store ─────────────────────────────────────────────────────────
 
@@ -288,5 +289,52 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
         r.id === recordId ? { ...r, canUndo: false } : r
       ),
     });
+  },
+}));
+
+// ─── Backup Store ───────────────────────────────────────────────────────────
+
+interface BackupState {
+  backups: BackupRecord[];
+  isLoaded: boolean;
+  isExporting: boolean;
+  exportProgress: { phase: string; processed: number; total: number; message: string } | null;
+  loadBackups: () => Promise<void>;
+  addBackup: (record: BackupRecord) => Promise<void>;
+  removeBackup: (backupId: string) => Promise<void>;
+  setExporting: (val: boolean) => void;
+  setExportProgress: (progress: { phase: string; processed: number; total: number; message: string } | null) => void;
+}
+
+export const useBackupStore = create<BackupState>((set, get) => ({
+  backups: [],
+  isLoaded: false,
+  isExporting: false,
+  exportProgress: null,
+
+  loadBackups: async () => {
+    const backups = await loadBackupHistory();
+    set({ backups, isLoaded: true });
+  },
+
+  addBackup: async (record: BackupRecord) => {
+    await saveBackupRecord(record);
+    const backups = await loadBackupHistory();
+    set({ backups });
+  },
+
+  removeBackup: async (backupId: string) => {
+    await deleteBackupRecord(backupId);
+    const backups = await loadBackupHistory();
+    set({ backups });
+  },
+
+  setExporting: (val: boolean) => {
+    set({ isExporting: val });
+    if (!val) set({ exportProgress: null });
+  },
+
+  setExportProgress: (progress) => {
+    set({ exportProgress: progress });
   },
 }));

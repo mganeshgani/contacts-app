@@ -1,13 +1,17 @@
 /**
- * AppLogo - Premium app logo component with gradient and animation
+ * AppLogo - SEO-optimized logo component
+ *
+ * Visual: spreadsheet table grid + contact person icon + green Excel badge
+ * Instantly communicates: "Excel/CSV + Contacts" to users.
+ * Supports multiple sizes and dark mode.
  */
 
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, SHADOWS, RADIUS } from '../constants';
+import { COLORS, SHADOWS } from '../constants';
 
 interface AppLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -16,15 +20,15 @@ interface AppLogoProps {
 }
 
 const SIZES = {
-  sm: { container: 40, icon: 20, fontSize: 14, subFontSize: 8, spacing: 4 },
-  md: { container: 56, icon: 28, fontSize: 18, subFontSize: 10, spacing: 6 },
-  lg: { container: 80, icon: 40, fontSize: 24, subFontSize: 12, spacing: 8 },
-  xl: { container: 120, icon: 56, fontSize: 32, subFontSize: 14, spacing: 12 },
+  sm: { container: 40, mainIcon: 22, gridIcon: 16, badgeSize: 16, badgeIcon: 10, fontSize: 13, subFontSize: 7, spacing: 4 },
+  md: { container: 56, mainIcon: 30, gridIcon: 20, badgeSize: 20, badgeIcon: 12, fontSize: 16, subFontSize: 9, spacing: 6 },
+  lg: { container: 80, mainIcon: 42, gridIcon: 28, badgeSize: 26, badgeIcon: 16, fontSize: 22, subFontSize: 11, spacing: 8 },
+  xl: { container: 120, mainIcon: 56, gridIcon: 38, badgeSize: 34, badgeIcon: 20, fontSize: 30, subFontSize: 13, spacing: 12 },
 };
 
 export function AppLogo({ size = 'lg', showText = true, isDark = false }: AppLogoProps) {
   const s = SIZES[size];
-  const borderRadius = s.container * 0.28;
+  const borderRadius = s.container * 0.26;
 
   return (
     <View style={styles.wrapper}>
@@ -42,7 +46,7 @@ export function AppLogo({ size = 'lg', showText = true, isDark = false }: AppLog
             },
           ]}
         >
-          {/* Glass accent */}
+          {/* Glass highlight */}
           <View
             style={[
               styles.glassOverlay,
@@ -54,23 +58,44 @@ export function AppLogo({ size = 'lg', showText = true, isDark = false }: AppLog
             ]}
           />
 
-          {/* Icon cluster */}
+          {/* Icon cluster: grid table + person + Excel badge */}
           <View style={styles.iconCluster}>
+            {/* Background: spreadsheet table grid */}
             <MaterialCommunityIcons
-              name="file-excel"
-              size={s.icon * 0.65}
-              color="rgba(255,255,255,0.4)"
+              name="table"
+              size={s.gridIcon}
+              color="rgba(255,255,255,0.3)"
               style={{
                 position: 'absolute',
-                top: -s.icon * 0.12,
-                left: -s.icon * 0.18,
+                top: -s.mainIcon * 0.14,
+                left: -s.mainIcon * 0.20,
               }}
             />
+            {/* Foreground: contact person */}
             <MaterialCommunityIcons
-              name="contacts"
-              size={s.icon}
+              name="account-box"
+              size={s.mainIcon}
               color="#FFFFFF"
             />
+            {/* Excel badge (green accent) */}
+            <View
+              style={[
+                styles.excelBadge,
+                {
+                  width: s.badgeSize,
+                  height: s.badgeSize,
+                  borderRadius: s.badgeSize / 2,
+                  bottom: -s.badgeSize * 0.2,
+                  right: -s.badgeSize * 0.3,
+                },
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="microsoft-excel"
+                size={s.badgeIcon}
+                color="#22C55E"
+              />
+            </View>
           </View>
         </LinearGradient>
       </View>
@@ -86,8 +111,8 @@ export function AppLogo({ size = 'lg', showText = true, isDark = false }: AppLog
               },
             ]}
           >
-            Excel
-            <Text style={{ color: COLORS.primaryLight }}>Contact</Text>
+            Smart
+            <Text style={{ color: COLORS.primaryLight }}> Contacts</Text>
           </Text>
           <Text
             style={[
@@ -98,7 +123,7 @@ export function AppLogo({ size = 'lg', showText = true, isDark = false }: AppLog
               },
             ]}
           >
-            IMPORTER
+            IMPORT & EXPORT
           </Text>
         </View>
       )}
@@ -126,6 +151,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  excelBadge: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: { elevation: 4 },
+    }),
+  },
   textContainer: {
     alignItems: 'center',
   },
@@ -135,7 +175,7 @@ const styles = StyleSheet.create({
   },
   logoSubtitle: {
     fontWeight: '700',
-    letterSpacing: 4,
+    letterSpacing: 3,
     marginTop: 2,
   },
 });

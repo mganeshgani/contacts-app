@@ -1,5 +1,5 @@
 /**
- * Core type definitions for ExcelContactImporter
+ * Core type definitions for Smart Contacts: Import & Export Excel/CSV
  */
 
 /** Raw row parsed from Excel/CSV before column mapping */
@@ -118,7 +118,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
   defaultCountryCode: '+91',
   autoSkipDuplicates: false,
-  batchSize: 100,
+  batchSize: 500,
   showOnboarding: true,
   defaultDuplicateAction: 'skip',
 };
@@ -143,7 +143,7 @@ export type RootStackParamList = {
 export type ToastType = 'success' | 'error' | 'info';
 
 /** File type support */
-export type SupportedFileType = 'xlsx' | 'xls' | 'csv';
+export type SupportedFileType = 'xlsx' | 'xls' | 'csv' | 'vcf';
 
 export const SUPPORTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // xlsx
@@ -151,6 +151,40 @@ export const SUPPORTED_MIME_TYPES = [
   'text/csv',
   'text/comma-separated-values',
   'application/csv',
+  'text/vcard',           // vcf
+  'text/x-vcard',         // vcf alternative
 ];
 
-export const SUPPORTED_EXTENSIONS = ['.xlsx', '.xls', '.csv'];
+export const SUPPORTED_EXTENSIONS = ['.xlsx', '.xls', '.csv', '.vcf'];
+
+/** ─── Export / Backup Types ─────────────────────────────────────────── */
+
+/** Supported export formats */
+export type ExportFormat = 'vcf' | 'csv' | 'xlsx';
+
+/** Options for exporting contacts */
+export interface ExportOptions {
+  format: ExportFormat;
+  /** If undefined, export all device contacts */
+  contactIds?: string[];
+  fileName?: string;
+  includePhotos?: boolean;
+}
+
+/** A saved backup / export file record */
+export interface BackupRecord {
+  id: string;
+  fileName: string;
+  fileUri: string;
+  format: ExportFormat;
+  contactCount: number;
+  fileSize: number;
+  createdAt: string;
+  isAutoBackup: boolean;
+}
+
+/** Sort options for contacts and history */
+export type SortField = 'name' | 'date' | 'recent';
+
+/** Import mode for conflict resolution */
+export type ImportMode = 'addNewOnly' | 'updateExisting' | 'replaceDuplicates';

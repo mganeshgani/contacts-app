@@ -20,7 +20,7 @@ export function SettingsScreen() {
   const { darkMode, language: lang, defaultCountryCode, autoSkipDuplicates, batchSize } = settings;
   const isDark = darkMode;
 
-  const PRESET_SIZES = [25, 50, 100, 200, 500];
+  const PRESET_SIZES = [100, 500, 1000, 2000, 5000];
   const isCustomSize = !PRESET_SIZES.includes(batchSize);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customValue, setCustomValue] = useState(isCustomSize ? String(batchSize) : '');
@@ -69,10 +69,10 @@ export function SettingsScreen() {
   const handleCustomValueSubmit = useCallback(() => {
     const parsed = parseInt(customValue, 10);
     if (!parsed || parsed < 1) {
-      Toast.show({ type: 'error', text1: 'Invalid batch size', text2: 'Enter a number between 1 and 1000' });
+      Toast.show({ type: 'error', text1: 'Invalid batch size', text2: 'Enter a number between 1 and 50000' });
       return;
     }
-    const clamped = Math.min(Math.max(parsed, 1), 1000);
+    const clamped = Math.min(Math.max(parsed, 1), 50000);
     updateSettings({ batchSize: clamped });
     setShowCustomInput(false);
   }, [customValue, updateSettings]);
@@ -288,7 +288,7 @@ export function SettingsScreen() {
             <View style={styles.customInputRow}>
               <TextInput
                 mode="outlined"
-                label="Batch size (1–1000)"
+                label="Batch size (1–50000)"
                 keyboardType="number-pad"
                 value={customValue}
                 onChangeText={setCustomValue}
@@ -328,6 +328,38 @@ export function SettingsScreen() {
           />
         </Surface>
 
+        {/* Privacy */}
+        <Text variant="titleSmall" style={[styles.sectionTitle, { color: subtextColor }]}>
+          {t('privacy', lang)}
+        </Text>
+        <Surface style={[styles.section, { backgroundColor: cardBg }]} elevation={1}>
+          <View style={styles.privacyRow}>
+            <MaterialCommunityIcons name="shield-check" size={22} color={COLORS.success} />
+            <View style={styles.privacyTextCol}>
+              <Text variant="bodyMedium" style={[styles.settingLabel, { color: textColor }]}>
+                {t('dataLocal', lang)}
+              </Text>
+              <Text variant="bodySmall" style={{ color: subtextColor, marginTop: 2 }}>
+                {t('privacyMessage', lang)}
+              </Text>
+            </View>
+          </View>
+          <Divider />
+          <View style={styles.privacyRow}>
+            <MaterialCommunityIcons name="server-off" size={22} color={COLORS.success} />
+            <Text variant="bodyMedium" style={[styles.settingLabel, { color: textColor }]}>
+              {t('noServerUpload', lang)}
+            </Text>
+          </View>
+          <Divider />
+          <View style={styles.privacyRow}>
+            <MaterialCommunityIcons name="eye-off" size={22} color={COLORS.success} />
+            <Text variant="bodyMedium" style={[styles.settingLabel, { color: textColor }]}>
+              {t('noTracking', lang)}
+            </Text>
+          </View>
+        </Surface>
+
         {/* About */}
         <Text variant="titleSmall" style={[styles.sectionTitle, { color: subtextColor }]}>
           {t('about', lang)}
@@ -341,7 +373,7 @@ export function SettingsScreen() {
                 color={COLORS.primary}
               />
               <Text variant="bodyLarge" style={[styles.settingLabel, { color: textColor }]}>
-                ExcelContactImporter
+                Smart Contacts
               </Text>
             </View>
             <Text variant="bodyMedium" style={{ color: subtextColor }}>
@@ -444,6 +476,16 @@ const styles = StyleSheet.create({
   },
   codeButton: {
     borderRadius: RADIUS.sm,
+  },
+  privacyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  privacyTextCol: {
+    flex: 1,
   },
   footer: {
     paddingVertical: 24,

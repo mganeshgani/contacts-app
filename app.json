@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ExcelContactImporter",
-    "slug": "excel-contact-importer",
+    "name": "Smart Contacts: Import & Export Excel/CSV",
+    "slug": "smart-contacts-import-export",
     "version": "1.0.0",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -22,9 +22,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.excelcontactimporter.app",
+      "bundleIdentifier": "com.smartcontacts.importexport",
       "infoPlist": {
-        "NSContactsUsageDescription": "This app needs access to your contacts to import Excel/CSV contact data into your phone book."
+        "NSContactsUsageDescription": "Smart Contacts needs access to your contacts to import, export, backup and manage your phone book."
       }
     },
     "android": {
@@ -36,14 +36,14 @@
         "android.permission.READ_CONTACTS",
         "android.permission.WRITE_CONTACTS"
       ],
-      "package": "com.excelcontactimporter.app"
+      "package": "com.smartcontacts.importexport"
     },
     "plugins": [
       "expo-updates",
       [
         "expo-contacts",
         {
-          "contactsPermission": "Allow ExcelContactImporter to access your contacts to detect duplicates and import new contacts."
+          "contactsPermission": "Allow Smart Contacts to access your contacts to import, export, backup, detect duplicates and manage your phone book."
         }
       ]
     ],

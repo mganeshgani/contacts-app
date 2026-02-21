@@ -4,8 +4,8 @@
 
 /** Batch processing */
 export const DEFAULT_BATCH_SIZE = 100;
-export const MAX_FILE_ROWS = 10_000;
-export const PARSE_TIMEOUT_MS = 10_000;
+export const MAX_FILE_ROWS = 50_000;
+export const PARSE_TIMEOUT_MS = 30_000;
 
 /** Phone validation */
 export const PHONE_MIN_DIGITS = 10;
@@ -46,6 +46,7 @@ export const STORAGE_KEYS = {
   IMPORT_HISTORY: '@eci_import_history',
   ONBOARDING_COMPLETE: '@eci_onboarding_complete',
   LAST_COLUMN_MAPPING: '@eci_last_column_mapping',
+  BACKUP_HISTORY: '@eci_backup_history',
 } as const;
 
 /** UI constants */

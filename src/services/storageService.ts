@@ -3,7 +3,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { AppSettings, ImportRecord, ColumnMapping } from '../types';
+import type { AppSettings, ImportRecord, ColumnMapping, BackupRecord } from '../types';
 import { DEFAULT_SETTINGS } from '../types';
 import { STORAGE_KEYS } from '../constants';
 
@@ -151,5 +151,49 @@ export async function clearAllData(): Promise<void> {
     await AsyncStorage.multiRemove(keys);
   } catch (error) {
     console.error('Failed to clear data:', error);
+  }
+}
+
+// ─── Backup History ─────────────────────────────────────────────────────────
+
+/**
+ * Load backup history from storage.
+ */
+export async function loadBackupHistory(): Promise<BackupRecord[]> {
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEYS.BACKUP_HISTORY);
+    if (raw) {
+      return JSON.parse(raw) as BackupRecord[];
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Save a new backup record.
+ */
+export async function saveBackupRecord(record: BackupRecord): Promise<void> {
+  try {
+    const history = await loadBackupHistory();
+    history.unshift(record);
+    const trimmed = history.slice(0, 100);
+    await AsyncStorage.setItem(STORAGE_KEYS.BACKUP_HISTORY, JSON.stringify(trimmed));
+  } catch (error) {
+    console.error('Failed to save backup record:', error);
+  }
+}
+
+/**
+ * Delete a backup record by ID.
+ */
+export async function deleteBackupRecord(backupId: string): Promise<void> {
+  try {
+    const history = await loadBackupHistory();
+    const filtered = history.filter((r) => r.id !== backupId);
+    await AsyncStorage.setItem(STORAGE_KEYS.BACKUP_HISTORY, JSON.stringify(filtered));
+  } catch (error) {
+    console.error('Failed to delete backup record:', error);
   }
 }

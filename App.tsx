@@ -1,8 +1,8 @@
 /**
- * ExcelContactImporter - App Entry Point
+ * Smart Contacts: Import & Export Excel/CSV - App Entry Point
  *
- * Production-ready React Native (Expo) app for importing
- * Excel/CSV contacts to the device phone book.
+ * Production-ready React Native (Expo) app for importing,
+ * exporting, and managing contacts from Excel/CSV/VCF files.
  */
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
@@ -59,13 +59,25 @@ const paperDarkTheme = {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
+  const [nativeSplashHidden, setNativeSplashHidden] = useState(false);
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const settings = useSettingsStore((s) => s.settings);
   const isDark = settings?.darkMode ?? false;
   const loadSettingsFn = useSettingsStore((s) => s.loadSettings);
 
-  const MIN_SPLASH_MS = 3000; // show splash for at least 3 seconds
+  const MIN_SPLASH_MS = 3200; // total animated splash screen duration
 
+  // Step 1: Hide native splash screen ASAP so our animated SplashLoader is visible
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync()
+        .catch(() => {})
+        .finally(() => setNativeSplashHidden(true));
+    }, 150); // small delay to let SplashLoader mount and start animations
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Step 2: Initialize app in background while SplashLoader plays
   const initialize = useCallback(async () => {
     const startTime = Date.now();
     try {
@@ -94,10 +106,9 @@ export default function App() {
     initialize();
   }, [initialize]);
 
+  // Step 3: Once app is ready AND native splash is hidden, fade out SplashLoader
   useEffect(() => {
-    if (isReady) {
-      SplashScreen.hideAsync().catch(() => {});
-      // Fade out splash over 500ms, then unmount it
+    if (isReady && nativeSplashHidden) {
       Animated.timing(splashOpacity, {
         toValue: 0,
         duration: 500,
@@ -105,22 +116,20 @@ export default function App() {
         useNativeDriver: true,
       }).start(() => setShowSplash(false));
     }
-  }, [isReady]);
+  }, [isReady, nativeSplashHidden]);
 
   if (!isReady || showSplash) {
     const paperTheme = isDark ? paperDarkTheme : paperLightTheme;
     return (
       <PaperProvider theme={paperTheme}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
         <Animated.View style={{ flex: 1, opacity: splashOpacity }}>
           <SplashLoader />
         </Animated.View>
-        {isReady && (
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor="transparent"
-            translucent
-          />
-        )}
       </PaperProvider>
     );
   }
