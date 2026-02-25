@@ -3,11 +3,12 @@
  */
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { RootStackParamList, RootTabParamList } from '../types';
 import { useSettingsStore } from '../store';
@@ -22,6 +23,7 @@ import {
   ImportProgressScreen,
   ImportSummaryScreen,
   OnboardingScreen,
+  WhatsAppMessageScreen,
 } from '../screens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,6 +57,12 @@ function MainTabs() {
   const settings = useSettingsStore((s) => s.settings);
   const lang = settings?.language ?? 'en';
   const isDark = settings?.darkMode ?? false;
+  const insets = useSafeAreaInsets();
+
+  // On Android edge-to-edge, insets.bottom reflects the system nav bar height.
+  // We MUST include it in the tab bar so it doesn't sit behind the system bar.
+  const bottomInset = Platform.OS === 'android' ? insets.bottom : 0;
+  const TAB_BAR_BASE_HEIGHT = 60;
 
   return (
     <Tab.Navigator
@@ -64,15 +72,15 @@ function MainTabs() {
         tabBarInactiveTintColor: isDark ? COLORS.textSecondaryDark : COLORS.textSecondary,
         tabBarStyle: {
           backgroundColor: isDark ? COLORS.surfaceDark : COLORS.surface,
-          borderTopColor: isDark ? COLORS.borderDark : COLORS.border,
-          elevation: 12,
+          borderTopWidth: 0,
+          elevation: 20,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.08,
-          shadowRadius: 12,
-          height: 64,
-          paddingBottom: 10,
-          paddingTop: 6,
+          shadowOffset: { width: 0, height: -6 },
+          shadowOpacity: 0.12,
+          shadowRadius: 16,
+          height: TAB_BAR_BASE_HEIGHT + bottomInset,
+          paddingBottom: bottomInset + 4,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -86,8 +94,8 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: t('home', lang),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} color={color} size={24} />
           ),
           tabBarAccessibilityLabel: t('home', lang),
         }}
@@ -97,8 +105,8 @@ function MainTabs() {
         component={PreviewScreen}
         options={{
           tabBarLabel: t('preview', lang),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="table-eye" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'table-eye' : 'table'} color={color} size={24} />
           ),
           tabBarAccessibilityLabel: t('preview', lang),
         }}
@@ -108,8 +116,8 @@ function MainTabs() {
         component={HistoryScreen}
         options={{
           tabBarLabel: t('history', lang),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="history" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'clock' : 'clock-outline'} color={color} size={24} />
           ),
           tabBarAccessibilityLabel: t('history', lang),
         }}
@@ -119,8 +127,8 @@ function MainTabs() {
         component={SettingsScreen}
         options={{
           tabBarLabel: t('settings', lang),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cog" color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'cog' : 'cog-outline'} color={color} size={24} />
           ),
           tabBarAccessibilityLabel: t('settings', lang),
         }}
@@ -151,6 +159,7 @@ export function AppNavigator() {
           options={{ gestureEnabled: false }}
         />
         <Stack.Screen name="ImportSummary" component={ImportSummaryScreen} />
+        <Stack.Screen name="WhatsAppMessage" component={WhatsAppMessageScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

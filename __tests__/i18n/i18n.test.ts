@@ -6,7 +6,7 @@ import { t, getAvailableLanguages } from '../../src/i18n';
 
 describe('t (translate)', () => {
   it('returns English translations by default', () => {
-    expect(t('appName', 'en')).toBe('ExcelContactImporter');
+    expect(t('appName', 'en')).toBe('Smart Contacts');
   });
 
   it('returns Tamil translations', () => {

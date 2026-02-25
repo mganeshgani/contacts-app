@@ -137,7 +137,21 @@ export type RootStackParamList = {
   ImportSummary: { recordId: string };
   ColumnMapper: undefined;
   Onboarding: undefined;
+  WhatsAppMessage: {
+    /** Contact IDs from the import record to pre-select */
+    contactIds?: string[];
+    /** Source record ID for context */
+    recordId?: string;
+  };
 };
+
+/** A contact entry for the WhatsApp messaging screen */
+export interface WhatsAppContact {
+  id: string;
+  name: string;
+  phone: string;
+  selected: boolean;
+}
 
 /** Toast types */
 export type ToastType = 'success' | 'error' | 'info';

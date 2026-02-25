@@ -618,7 +618,7 @@ export function HomeScreen() {
               <ActivityIndicator style={styles.loader} />
             )
           }
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 100 }]}
           refreshControl={
             <RefreshControl
               refreshing={false}
@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   listContent: {
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
   headerSection: {
     paddingBottom: 4,
@@ -656,8 +656,10 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingBottom: 28,
+    paddingBottom: 32,
     overflow: 'hidden',
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
   heroBgCircle: {
     position: 'absolute',
@@ -699,7 +701,8 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     marginTop: 20,
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.xl,
+    ...SHADOWS.lg,
   },
   uploadButtonLabel: {
     fontWeight: '800',
@@ -710,8 +713,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   backupButton: {
-    marginTop: 10,
-    borderRadius: RADIUS.lg,
+    marginTop: 12,
+    borderRadius: RADIUS.xl,
     borderColor: 'rgba(255,255,255,0.5)',
     borderWidth: 1.5,
   },
@@ -742,16 +745,18 @@ const styles = StyleSheet.create({
   // Quick Stats
   quickStats: {
     flexDirection: 'row',
-    marginHorizontal: 12,
-    marginTop: -16,
-    gap: 8,
+    marginHorizontal: 14,
+    marginTop: -20,
+    gap: 10,
   },
   quickStatCard: {
     flex: 1,
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
-    paddingVertical: 12,
+    borderRadius: RADIUS.lg,
+    paddingVertical: 14,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
     ...SHADOWS.md,
   },
   quickStatValue: {
@@ -783,12 +788,14 @@ const styles = StyleSheet.create({
   recordCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    marginHorizontal: 12,
+    padding: 16,
+    marginHorizontal: 14,
     marginVertical: 5,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
-    ...SHADOWS.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    ...SHADOWS.md,
   },
   recordIcon: {
     width: 44,
@@ -867,11 +874,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.xl,
-    padding: 24,
+    borderRadius: 28,
+    padding: 28,
     width: '100%',
     maxWidth: 360,
-    ...SHADOWS.lg,
+    ...SHADOWS.xl,
   },
   modalTitle: {
     fontWeight: '800',

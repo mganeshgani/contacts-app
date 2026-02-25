@@ -3,7 +3,7 @@
  */
 
 import * as XLSX from 'xlsx';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import type { ParsedFile, RawRow, ColumnMapping } from '../types';
 import { HEADER_ALIASES, MAX_FILE_ROWS } from '../constants';
 

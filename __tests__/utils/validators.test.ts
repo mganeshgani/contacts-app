@@ -9,6 +9,7 @@ import {
   validateEmail,
   generateRowId,
   mapRawRowToContact,
+  applyNamePostfix,
 } from '../../src/utils/validators';
 import type { ColumnMapping, RawRow } from '../../src/types';
 
@@ -156,5 +157,60 @@ describe('mapRawRowToContact', () => {
     const contact = mapRawRowToContact(raw, mapping);
     expect(contact.isValid).toBe(true);
     expect(contact.validationErrors).toEqual([]);
+  });
+});
+
+describe('applyNamePostfix', () => {
+  it('appends postfix with a space separator', () => {
+    expect(applyNamePostfix('Ganesh', 'MCA 2025 Batch')).toBe('Ganesh MCA 2025 Batch');
+  });
+
+  it('returns original name when postfix is empty string', () => {
+    expect(applyNamePostfix('Ganesh', '')).toBe('Ganesh');
+  });
+
+  it('returns original name when postfix is only whitespace', () => {
+    expect(applyNamePostfix('Ganesh', '   ')).toBe('Ganesh');
+  });
+
+  it('returns original name when postfix is undefined', () => {
+    expect(applyNamePostfix('Ganesh', undefined)).toBe('Ganesh');
+  });
+
+  it('returns original name when postfix is null', () => {
+    expect(applyNamePostfix('Ganesh', null)).toBe('Ganesh');
+  });
+
+  it('trims both name and postfix', () => {
+    expect(applyNamePostfix('  Ganesh  ', '  MCA 2025  ')).toBe('Ganesh MCA 2025');
+  });
+
+  it('handles empty name gracefully', () => {
+    expect(applyNamePostfix('', 'MCA 2025')).toBe('');
+  });
+
+  it('handles undefined-like name', () => {
+    // When name is empty string after trim
+    expect(applyNamePostfix('   ', 'MCA 2025')).toBe('');
+  });
+
+  it('does not double-append if name already ends with postfix', () => {
+    expect(applyNamePostfix('Ganesh MCA 2025', 'MCA 2025')).toBe('Ganesh MCA 2025');
+  });
+
+  it('double-append check is case-insensitive', () => {
+    expect(applyNamePostfix('Ganesh mca 2025', 'MCA 2025')).toBe('Ganesh mca 2025');
+  });
+
+  it('works with single-word names', () => {
+    expect(applyNamePostfix('Ganesh', 'B')).toBe('Ganesh B');
+  });
+
+  it('works with multi-word postfix containing special characters', () => {
+    expect(applyNamePostfix('Ganesh', 'MCA (2025) - Batch #1')).toBe('Ganesh MCA (2025) - Batch #1');
+  });
+
+  it('works with Unicode names and postfix', () => {
+    expect(applyNamePostfix('गणेश', 'एमसीए 2025')).toBe('गणेश एमसीए 2025');
   });
 });

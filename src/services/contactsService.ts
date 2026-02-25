@@ -14,6 +14,7 @@ import type {
   DuplicateAction,
 } from '../types';
 import { phoneToLookupKey, applyCountryCode, normalizePhone, validatePhone } from '../utils/phoneUtils';
+import { applyNamePostfix } from '../utils/validators';
 import { DEFAULT_BATCH_SIZE } from '../constants';
 
 /** Max retries for individual contact save */
@@ -190,16 +191,18 @@ function splitName(fullName: string): { firstName: string; lastName: string } {
 
 /**
  * Build a Contacts.Contact object from a ContactRow.
+ * If namePostfix is provided, it is appended to the contact name.
  */
-function buildContactPayload(row: ContactRow, countryCode: string): Contacts.Contact {
-  const { firstName, lastName } = splitName(row.name);
+function buildContactPayload(row: ContactRow, countryCode: string, namePostfix?: string): Contacts.Contact {
+  const finalName = applyNamePostfix(row.name, namePostfix);
+  const { firstName, lastName } = splitName(finalName);
   const phone = applyCountryCode(row.phone, countryCode);
 
   const contact: Contacts.Contact = {
     contactType: Contacts.ContactTypes.Person,
     firstName,
     lastName,
-    name: row.name.trim(),
+    name: finalName,
     phoneNumbers: [
       {
         number: phone,
@@ -234,8 +237,8 @@ function buildContactPayload(row: ContactRow, countryCode: string): Contacts.Con
  * Add a single contact to the device with retry logic.
  * Returns the new contact ID.
  */
-export async function addContactToDevice(row: ContactRow, countryCode: string): Promise<string> {
-  const contact = buildContactPayload(row, countryCode);
+export async function addContactToDevice(row: ContactRow, countryCode: string, namePostfix?: string): Promise<string> {
+  const contact = buildContactPayload(row, countryCode, namePostfix);
 
   let lastError: Error | null = null;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -259,15 +262,17 @@ export async function addContactToDevice(row: ContactRow, countryCode: string): 
 export async function updateContactOnDevice(
   existingId: string,
   row: ContactRow,
-  countryCode: string
+  countryCode: string,
+  namePostfix?: string
 ): Promise<void> {
-  const contact = buildContactPayload(row, countryCode);
-  const updates: Contacts.Contact = { ...contact, id: existingId };
+  const contact = buildContactPayload(row, countryCode, namePostfix);
+  // SDK 54: updateContactAsync expects { id: string } & Partial<Contact>
+  const updates = { ...contact, id: existingId };
 
   let lastError: Error | null = null;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      await Contacts.updateContactAsync(updates);
+      await Contacts.updateContactAsync(updates as any);
       return;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -314,7 +319,8 @@ export async function bulkImportContacts(
   countryCode: string,
   batchSize: number = DEFAULT_BATCH_SIZE,
   onProgress?: (progress: ImportProgress) => void,
-  cancelToken?: { cancelled: boolean }
+  cancelToken?: { cancelled: boolean },
+  namePostfix?: string
 ): Promise<{
   progress: ImportProgress;
   addedContactIds: string[];
@@ -426,14 +432,14 @@ export async function bulkImportContacts(
               break;
             case 'update':
               if (row.existingContactId) {
-                await updateContactOnDevice(row.existingContactId, row, countryCode);
+                await updateContactOnDevice(row.existingContactId, row, countryCode, namePostfix);
                 progress.updated++;
               } else {
                 progress.skipped++;
               }
               break;
             case 'force_add': {
-              const newId = await addContactToDevice(row, countryCode);
+              const newId = await addContactToDevice(row, countryCode, namePostfix);
               addedContactIds.push(newId);
               phonesAddedInSession.add(lookupKey);
               progress.successful++;
@@ -444,7 +450,7 @@ export async function bulkImportContacts(
           // Duplicate within same import session - skip to avoid double entry
           progress.skipped++;
         } else {
-          const newId = await addContactToDevice(row, countryCode);
+          const newId = await addContactToDevice(row, countryCode, namePostfix);
           addedContactIds.push(newId);
           phonesAddedInSession.add(lookupKey);
           progress.successful++;

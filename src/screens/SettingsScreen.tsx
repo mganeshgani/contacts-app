@@ -115,11 +115,13 @@ export function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor, paddingTop: insets.top }]}>
-      <Text variant="headlineSmall" style={[styles.headerTitle, { color: textColor }]}>
-        {t('settings', lang)}
-      </Text>
+      <View style={styles.headerRow}>
+        <Text variant="headlineSmall" style={[styles.headerTitle, { color: textColor }]}>
+          {t('settings', lang)}
+        </Text>
+      </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 32 }]}>
         {/* Appearance */}
         <Text variant="titleSmall" style={[styles.sectionTitle, { color: subtextColor }]}>
           Appearance
@@ -396,10 +398,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerTitle: {
-    fontWeight: '800',
+  headerRow: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  headerTitle: {
+    fontWeight: '800',
   },
   scrollContent: {
     paddingBottom: 32,
@@ -414,10 +418,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   section: {
-    marginHorizontal: 12,
+    marginHorizontal: 14,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    ...SHADOWS.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    ...SHADOWS.md,
   },
   settingRow: {
     flexDirection: 'row',

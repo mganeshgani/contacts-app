@@ -11,7 +11,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
 
@@ -158,6 +158,13 @@ export function ImportSummaryScreen() {
     navigation.navigate('MainTabs');
   }, [resetContacts, navigation]);
 
+  const handleWhatsApp = useCallback(() => {
+    navigation.navigate('WhatsAppMessage', {
+      contactIds: record?.contactIds ?? [],
+      recordId: record?.id,
+    });
+  }, [navigation, record]);
+
   if (!record) {
     return (
       <View style={styles.container}>
@@ -173,7 +180,7 @@ export function ImportSummaryScreen() {
       style={[
         styles.container,
         isDark && { backgroundColor: COLORS.backgroundDark },
-        { paddingTop: insets.top },
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
       <ScrollView
@@ -288,6 +295,18 @@ export function ImportSummaryScreen() {
           >
             {t('exportCSV', lang)}
           </Button>
+
+          <Button
+            mode="contained"
+            onPress={handleWhatsApp}
+            icon="whatsapp"
+            style={[styles.actionButton, styles.whatsappButton]}
+            labelStyle={{ fontWeight: '700' }}
+            buttonColor="#25D366"
+            textColor="#FFFFFF"
+          >
+            {t('sendViaWhatsapp', lang)}
+          </Button>
         </View>
 
         {/* Done Button */}
@@ -381,9 +400,11 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     width: '100%',
-    borderRadius: RADIUS.xl,
+    borderRadius: 24,
     marginTop: 24,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
     ...SHADOWS.md,
   },
   rowDivider: {
@@ -395,11 +416,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionButton: {
-    borderRadius: RADIUS.sm,
+    borderRadius: RADIUS.lg,
+  },
+  whatsappButton: {
+    marginTop: 8,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.md,
   },
   doneButton: {
     marginTop: 32,
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.xl,
     width: '100%',
     ...SHADOWS.lg,
   },

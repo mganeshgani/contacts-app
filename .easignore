@@ -1,0 +1,11 @@
+# Ignore large folders not needed for EAS Build
+node_modules/
+android/
+ios/
+.expo/
+.git/
+coverage/
+__tests__/
+*.test.ts
+*.test.tsx
+*.md

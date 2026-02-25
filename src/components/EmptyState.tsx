@@ -1,12 +1,12 @@
 /**
- * EmptyState - Reusable empty state placeholder
+ * EmptyState - Premium empty state placeholder
  */
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, RADIUS } from '../constants';
+import { COLORS, RADIUS, SHADOWS } from '../constants';
 import { useSettingsStore } from '../store';
 
 interface EmptyStateProps {
@@ -28,11 +28,13 @@ export function EmptyState({
 
   return (
     <View style={styles.container}>
-      <MaterialCommunityIcons
-        name={icon as any}
-        size={80}
-        color={isDark ? COLORS.textSecondaryDark : COLORS.textSecondary}
-      />
+      <View style={[styles.iconCircle, isDark && { backgroundColor: COLORS.surfaceDark }]}>
+        <MaterialCommunityIcons
+          name={icon as any}
+          size={48}
+          color={isDark ? COLORS.textSecondaryDark : COLORS.primaryLight}
+        />
+      </View>
       <Text
         variant="titleLarge"
         style={[styles.title, isDark && { color: COLORS.textDark }]}
@@ -50,6 +52,7 @@ export function EmptyState({
           mode="contained"
           onPress={onAction}
           style={styles.button}
+          labelStyle={{ fontWeight: '700' }}
         >
           {actionLabel}
         </Button>
@@ -65,10 +68,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 32,
   },
+  iconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: COLORS.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.sm,
+  },
   title: {
     fontWeight: '800',
     color: COLORS.text,
-    marginTop: 16,
+    marginTop: 20,
     textAlign: 'center',
   },
   message: {
@@ -80,6 +92,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
   },
 });

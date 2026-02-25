@@ -160,3 +160,24 @@ export function validateBatch(contacts: ContactRow[]): {
 
   return { valid, invalid, total: contacts.length };
 }
+
+/**
+ * Apply an optional name postfix/suffix to a contact name.
+ * Returns the original name if postfix is empty/null/undefined.
+ * Trims both parts and ensures single space between them.
+ * Does NOT apply the postfix if the name already ends with it (case-insensitive).
+ */
+export function applyNamePostfix(name: string, postfix?: string | null): string {
+  const trimmedName = (name || '').trim();
+  if (!trimmedName) return trimmedName;
+  
+  const trimmedPostfix = (postfix || '').trim();
+  if (!trimmedPostfix) return trimmedName;
+
+  // Avoid double-appending if name already ends with the postfix
+  if (trimmedName.toLowerCase().endsWith(trimmedPostfix.toLowerCase())) {
+    return trimmedName;
+  }
+
+  return `${trimmedName} ${trimmedPostfix}`;
+}

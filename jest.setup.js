@@ -35,7 +35,22 @@ jest.mock('expo-contacts', () => ({
   },
 }));
 
-// Mock expo-file-system
+// Mock expo-file-system (legacy)
+jest.mock('expo-file-system/legacy', () => ({
+  readAsStringAsync: jest.fn(() => Promise.resolve('')),
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
+  getInfoAsync: jest.fn(() => Promise.resolve({ exists: false })),
+  readDirectoryAsync: jest.fn(() => Promise.resolve([])),
+  documentDirectory: '/mock/documents/',
+  EncodingType: {
+    Base64: 'base64',
+    UTF8: 'utf8',
+  },
+}));
+
+// Mock expo-file-system (new API - for any code importing from the root)
 jest.mock('expo-file-system', () => ({
   readAsStringAsync: jest.fn(() => Promise.resolve('')),
   writeAsStringAsync: jest.fn(() => Promise.resolve()),

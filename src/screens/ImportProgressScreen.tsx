@@ -96,7 +96,7 @@ export function ImportProgressScreen() {
       style={[
         styles.container,
         isDark && { backgroundColor: COLORS.backgroundDark },
-        { paddingTop: insets.top },
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
       <View style={styles.center}>
@@ -284,9 +284,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   iconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 30,
+    width: 110,
+    height: 110,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
     ...SHADOWS.xl,

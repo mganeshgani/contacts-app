@@ -5,3 +5,4 @@ export { ImportSummaryScreen } from './ImportSummaryScreen';
 export { HistoryScreen } from './HistoryScreen';
 export { SettingsScreen } from './SettingsScreen';
 export { OnboardingScreen } from './OnboardingScreen';
+export { WhatsAppMessageScreen } from './WhatsAppMessageScreen';

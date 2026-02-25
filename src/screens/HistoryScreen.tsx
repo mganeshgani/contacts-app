@@ -7,9 +7,11 @@ import { View, StyleSheet, FlatList, Alert, RefreshControl, Pressable } from 're
 import { Text, Surface, Button, ActivityIndicator, IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 
-import type { ImportRecord, BackupRecord } from '../types';
+import type { ImportRecord, BackupRecord, RootStackParamList } from '../types';
 import { useHistoryStore, useSettingsStore, useBackupStore } from '../store';
 import { useImport } from '../hooks/useImport';
 import { EmptyState } from '../components';
@@ -20,6 +22,7 @@ import { shareBackupFile, deleteBackupFile } from '../services/exportService';
 type TabKey = 'imports' | 'exports';
 
 export function HistoryScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const lang = useSettingsStore((s) => s.settings.language);
   const isDark = useSettingsStore((s) => s.settings.darkMode);
@@ -178,6 +181,26 @@ export function HistoryScreen() {
               {t('undoImport', lang)}
             </Button>
           )}
+
+          {item.contactIds && item.contactIds.length > 0 && (
+            <Button
+              mode="contained"
+              onPress={() =>
+                navigation.navigate('WhatsAppMessage', {
+                  contactIds: item.contactIds,
+                  recordId: item.id,
+                })
+              }
+              icon="whatsapp"
+              compact
+              style={styles.whatsappButton}
+              buttonColor="#25D366"
+              textColor="#FFFFFF"
+              labelStyle={{ fontSize: 12, fontWeight: '700' }}
+            >
+              {t('sendViaWhatsapp', lang)}
+            </Button>
+          )}
         </Surface>
       );
     },
@@ -283,21 +306,23 @@ export function HistoryScreen() {
         { paddingTop: insets.top },
       ]}
     >
-      <Text
-        variant="headlineSmall"
-        style={[styles.headerTitle, isDark && { color: COLORS.textDark }]}
-      >
-        {t('history', lang)}
-      </Text>
+      <View style={styles.headerRow}>
+        <Text
+          variant="headlineSmall"
+          style={[styles.headerTitle, isDark && { color: COLORS.textDark }]}
+        >
+          {t('history', lang)}
+        </Text>
+      </View>
 
       {/* Tabs */}
-      <View style={styles.tabRow}>
+      <View style={[styles.tabRow, isDark && { backgroundColor: 'rgba(255,255,255,0.06)' }]}>
         <Pressable
           onPress={() => setActiveTab('imports')}
           style={[
             styles.tab,
             activeTab === 'imports' && styles.tabActive,
-            activeTab === 'imports' && { borderBottomColor: COLORS.primary },
+            activeTab === 'imports' && isDark && { backgroundColor: COLORS.surfaceDark },
           ]}
         >
           <MaterialCommunityIcons
@@ -318,7 +343,7 @@ export function HistoryScreen() {
           style={[
             styles.tab,
             activeTab === 'exports' && styles.tabActive,
-            activeTab === 'exports' && { borderBottomColor: COLORS.primary },
+            activeTab === 'exports' && isDark && { backgroundColor: COLORS.surfaceDark },
           ]}
         >
           <MaterialCommunityIcons
@@ -341,7 +366,7 @@ export function HistoryScreen() {
           data={records}
           renderItem={renderImportRecord}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
@@ -363,7 +388,7 @@ export function HistoryScreen() {
           data={backups}
           renderItem={renderBackupRecord}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
@@ -424,18 +449,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  headerTitle: {
-    fontWeight: '800',
+  headerRow: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  headerTitle: {
+    fontWeight: '800',
     color: COLORS.text,
   },
   tabRow: {
     flexDirection: 'row',
-    marginHorizontal: 12,
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    marginHorizontal: 14,
+    marginBottom: 10,
+    backgroundColor: 'rgba(0,0,0,0.04)',
+    borderRadius: RADIUS.md,
+    padding: 4,
   },
   tab: {
     flex: 1,
@@ -444,11 +472,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 10,
-    borderBottomWidth: 2,
+    borderRadius: RADIUS.sm,
+    borderBottomWidth: 0,
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomWidth: 2,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 0,
+    ...SHADOWS.sm,
   },
   tabLabel: {
     fontSize: 14,
@@ -459,11 +490,13 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   card: {
-    marginHorizontal: 12,
+    marginHorizontal: 14,
     marginVertical: 6,
     borderRadius: RADIUS.lg,
     padding: 16,
-    ...SHADOWS.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    ...SHADOWS.md,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -490,6 +523,11 @@ const styles = StyleSheet.create({
   undoButton: {
     marginTop: 12,
     borderColor: COLORS.error,
+    borderRadius: RADIUS.sm,
+    alignSelf: 'flex-start',
+  },
+  whatsappButton: {
+    marginTop: 8,
     borderRadius: RADIUS.sm,
     alignSelf: 'flex-start',
   },

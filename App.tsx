@@ -6,9 +6,11 @@
  */
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StatusBar, LogBox, Animated, Easing } from 'react-native';
+import { StatusBar, LogBox, Animated, Easing, StyleSheet, Platform } from 'react-native';
 import { Provider as PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
+import * as NavigationBar from 'expo-navigation-bar';
 import Toast from 'react-native-toast-message';
 
 import { AppNavigator } from './src/navigation';
@@ -59,22 +61,24 @@ const paperDarkTheme = {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
-  const [nativeSplashHidden, setNativeSplashHidden] = useState(false);
+  const [splashMounted, setSplashMounted] = useState(false);
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const settings = useSettingsStore((s) => s.settings);
+  const isSettingsLoaded = useSettingsStore((s) => s.isLoaded);
   const isDark = settings?.darkMode ?? false;
   const loadSettingsFn = useSettingsStore((s) => s.loadSettings);
 
   const MIN_SPLASH_MS = 3200; // total animated splash screen duration
 
-  // Step 1: Hide native splash screen ASAP so our animated SplashLoader is visible
+  // Step 1: Mark splash as mounted on first render, then hide native splash
   useEffect(() => {
-    const timer = setTimeout(() => {
-      SplashScreen.hideAsync()
-        .catch(() => {})
-        .finally(() => setNativeSplashHidden(true));
-    }, 150); // small delay to let SplashLoader mount and start animations
-    return () => clearTimeout(timer);
+    // Use requestAnimationFrame to ensure our SplashLoader has painted before
+    // hiding the native splash screen — prevents blank/white flash
+    const raf = requestAnimationFrame(() => {
+      setSplashMounted(true);
+      SplashScreen.hideAsync().catch(() => {});
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   // Step 2: Initialize app in background while SplashLoader plays
@@ -106,50 +110,70 @@ export default function App() {
     initialize();
   }, [initialize]);
 
-  // Step 3: Once app is ready AND native splash is hidden, fade out SplashLoader
+  // Step 3: Once app is ready AND settings loaded, fade out SplashLoader
   useEffect(() => {
-    if (isReady && nativeSplashHidden) {
-      Animated.timing(splashOpacity, {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }).start(() => setShowSplash(false));
+    if (isReady && splashMounted && isSettingsLoaded) {
+      // Small extra delay to let the navigator mount behind the splash
+      const timer = setTimeout(() => {
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 500,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }).start(() => setShowSplash(false));
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [isReady, nativeSplashHidden]);
+  }, [isReady, splashMounted, isSettingsLoaded]);
 
-  if (!isReady || showSplash) {
-    const paperTheme = isDark ? paperDarkTheme : paperLightTheme;
-    return (
-      <PaperProvider theme={paperTheme}>
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor="transparent"
-          translucent
-        />
-        <Animated.View style={{ flex: 1, opacity: splashOpacity }}>
-          <SplashLoader />
-        </Animated.View>
-      </PaperProvider>
-    );
-  }
+  // Configure Android system navigation bar button style (light/dark).
+  // In SDK 54 with edge-to-edge enforced, setPositionAsync and
+  // setBackgroundColorAsync are no-ops, so we only set button style.
+  // The actual overlap prevention is handled by dynamic insets.bottom
+  // in the tab bar (see AppNavigator).
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setButtonStyleAsync(
+        isDark ? 'light' : 'dark'
+      ).catch(() => {});
+    }
+  }, [isDark]);
 
   const paperTheme = isDark ? paperDarkTheme : paperLightTheme;
 
+  // Always render both splash + navigator together so the navigator has time
+  // to mount behind the splash overlay — prevents "Something went wrong" flash
   return (
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
     <ErrorBoundary>
       <PaperProvider theme={paperTheme}>
         <StatusBar
-          barStyle={isDark ? 'light-content' : 'dark-content'}
-          backgroundColor={isDark ? COLORS.backgroundDark : COLORS.background}
+          barStyle={showSplash ? 'light-content' : isDark ? 'light-content' : 'dark-content'}
+          backgroundColor="transparent"
+          translucent={true}
         />
-        <AppNavigator />
-        <Toast
-          position="bottom"
-          bottomOffset={80}
-          visibilityTime={3000}
-        />
+
+        {/* Main app renders underneath the splash overlay */}
+        {isReady && isSettingsLoaded && <AppNavigator />}
+        {isReady && isSettingsLoaded && (
+          <Toast position="bottom" bottomOffset={80} visibilityTime={3000} />
+        )}
+
+        {/* Splash overlay on top — fades out when ready */}
+        {showSplash && (
+          <Animated.View
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              opacity: splashOpacity,
+              zIndex: 999,
+            }}
+            pointerEvents={isReady ? 'none' : 'auto'}
+          >
+            <SplashLoader />
+          </Animated.View>
+        )}
       </PaperProvider>
     </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }

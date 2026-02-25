@@ -3,13 +3,14 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
-import { Text, Searchbar, Button, Divider, IconButton } from 'react-native-paper';
+import { View, StyleSheet, FlatList, Alert, TextInput, Pressable } from 'react-native';
+import { Text, Searchbar, Button, Divider, IconButton, Surface } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import type { RootStackParamList, ContactRow, DuplicateAction } from '../types';
 import { useContactsStore, useSettingsStore } from '../store';
@@ -51,11 +52,14 @@ export function PreviewScreen() {
   const updateContact = useContactsStore((s) => s.updateContact);
   const setDuplicateAction = useContactsStore((s) => s.setDuplicateAction);
   const setBulkDuplicateAction = useContactsStore((s) => s.setBulkDuplicateAction);
+  const namePostfix = useContactsStore((s) => s.namePostfix);
+  const setNamePostfix = useContactsStore((s) => s.setNamePostfix);
 
   // UI state
   const [showColumnMapper, setShowColumnMapper] = useState(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [editingContact, setEditingContact] = useState<ContactRow | null>(null);
+  const [showPostfix, setShowPostfix] = useState(false);
 
   // Search
   const { searchQuery, setSearchQuery, filteredContacts, clearSearch } =
@@ -132,10 +136,15 @@ export function PreviewScreen() {
       return;
     }
 
+    const postfixInfo = namePostfix.trim()
+      ? `\n${t('namePostfix', lang)}: "${namePostfix.trim()}"`
+      : '';
+
     Alert.alert(
       t('startImport', lang),
       `Import ${toImportCount} contact${toImportCount !== 1 ? 's' : ''} to your device?` +
-        (selectedDups.length > 0 ? `\n(${selectedDups.length} duplicate${selectedDups.length !== 1 ? 's' : ''} will be updated/added)` : ''),
+        (selectedDups.length > 0 ? `\n(${selectedDups.length} duplicate${selectedDups.length !== 1 ? 's' : ''} will be updated/added)` : '') +
+        postfixInfo,
       [
         { text: t('cancel', lang), style: 'cancel' },
         {
@@ -151,7 +160,7 @@ export function PreviewScreen() {
         },
       ]
     );
-  }, [navigation, contacts, lang]);
+  }, [navigation, contacts, namePostfix, lang]);
 
   const handleEdit = useCallback((contact: ContactRow) => {
     setEditingContact(contact);
@@ -299,6 +308,77 @@ export function PreviewScreen() {
 
       <Divider />
 
+      {/* Name Suffix (Optional) */}
+      <Surface
+        style={[
+          styles.postfixCard,
+          isDark && { backgroundColor: COLORS.surfaceDark },
+        ]}
+        elevation={1}
+      >
+        <Pressable
+          onPress={() => setShowPostfix((v) => !v)}
+          style={styles.postfixHeader}
+        >
+          <MaterialCommunityIcons
+            name="tag-text-outline"
+            size={18}
+            color={namePostfix.trim() ? COLORS.primary : isDark ? COLORS.textSecondaryDark : COLORS.textSecondary}
+          />
+          <Text
+            variant="labelLarge"
+            style={[
+              styles.postfixLabel,
+              isDark && { color: COLORS.textDark },
+              namePostfix.trim() ? { color: COLORS.primary } : {},
+            ]}
+          >
+            {t('namePostfix', lang)}
+          </Text>
+          <MaterialCommunityIcons
+            name={showPostfix ? 'chevron-up' : 'chevron-down'}
+            size={20}
+            color={isDark ? COLORS.textSecondaryDark : COLORS.textSecondary}
+          />
+        </Pressable>
+        {showPostfix && (
+          <View style={styles.postfixBody}>
+            <TextInput
+              value={namePostfix}
+              onChangeText={setNamePostfix}
+              placeholder={t('namePostfixPlaceholder', lang)}
+              placeholderTextColor={isDark ? COLORS.textSecondaryDark : COLORS.textSecondary}
+              style={[
+                styles.postfixInput,
+                isDark && {
+                  borderColor: COLORS.borderDark,
+                  color: COLORS.textDark,
+                  backgroundColor: COLORS.backgroundDark,
+                },
+              ]}
+              autoCorrect={false}
+              returnKeyType="done"
+            />
+            <Text
+              variant="bodySmall"
+              style={[styles.postfixHint, isDark && { color: COLORS.textSecondaryDark }]}
+            >
+              {t('namePostfixHint', lang)}
+            </Text>
+            {namePostfix.trim().length > 0 && contacts.length > 0 && (
+              <Text
+                variant="bodySmall"
+                style={[styles.postfixPreview, isDark && { color: COLORS.primaryLight }]}
+              >
+                {t('namePostfixPreview', lang, {
+                  name: `${contacts[0]?.name || 'Contact'} ${namePostfix.trim()}`,
+                })}
+              </Text>
+            )}
+          </View>
+        )}
+      </Surface>
+
       {/* Contacts List */}
       <FlatList
         data={filteredContacts}
@@ -379,9 +459,11 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   searchbar: {
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
     elevation: 0,
-    height: 44,
+    height: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   actionBar: {
     flexDirection: 'row',
@@ -397,8 +479,54 @@ const styles = StyleSheet.create({
   actionBtn: {
     borderRadius: RADIUS.sm,
   },
+  postfixCard: {
+    marginHorizontal: 12,
+    marginVertical: 6,
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    overflow: 'hidden',
+  },
+  postfixHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  postfixLabel: {
+    flex: 1,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  postfixBody: {
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+  },
+  postfixInput: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: COLORS.text,
+    backgroundColor: COLORS.background,
+  },
+  postfixHint: {
+    marginTop: 6,
+    color: COLORS.textSecondary,
+    fontSize: 12,
+  },
+  postfixPreview: {
+    marginTop: 4,
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   listContent: {
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   fabContainer: {
     position: 'absolute',
@@ -406,7 +534,7 @@ const styles = StyleSheet.create({
     right: 16,
   },
   importButton: {
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.xl,
     ...SHADOWS.lg,
   },
   importButtonLabel: {

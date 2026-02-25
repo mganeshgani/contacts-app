@@ -1,9 +1,8 @@
 /**
- * SplashLoader - Premium animated loading screen
+ * SplashLoader - Premium animated loading screen with college logo
  *
- * Rebuilt for reliability: uses only scale, opacity, translateY.
- * No dashed borders, no complex orbit math.
- * Clean, modern design with the new app branding.
+ * Uses the actual college logo image.
+ * Clean, modern design with smooth animations.
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -14,13 +13,16 @@ import {
   Dimensions,
   Easing,
   Platform,
+  Image,
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 
 const { width: SW, height: SH } = Dimensions.get('window');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const logoImage = require('../../assets/logo.png');
 
 export function SplashLoader() {
   /* ── Animation values ── */
@@ -210,34 +212,12 @@ export function SplashLoader() {
             end={{ x: 1, y: 1 }}
             style={styles.logoGradient}
           >
-            {/* Glass highlight */}
-            <View style={styles.logoGlass} />
-
-            {/* Icon cluster: spreadsheet grid + person */}
-            <View style={styles.iconCluster}>
-              {/* Spreadsheet grid background */}
-              <View style={styles.gridIcon}>
-                <MaterialCommunityIcons
-                  name="table"
-                  size={38}
-                  color="rgba(255,255,255,0.3)"
-                />
-              </View>
-              {/* Contact person overlay */}
-              <MaterialCommunityIcons
-                name="account-box"
-                size={52}
-                color="#FFFFFF"
-              />
-              {/* Small green Excel accent */}
-              <View style={styles.excelBadge}>
-                <MaterialCommunityIcons
-                  name="microsoft-excel"
-                  size={18}
-                  color="#22C55E"
-                />
-              </View>
-            </View>
+            {/* College logo image */}
+            <Image
+              source={logoImage}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </LinearGradient>
         </View>
       </Animated.View>
@@ -349,47 +329,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoGlass: {
-    position: 'absolute',
-    top: -4,
-    left: -4,
-    width: LOGO_SIZE * 0.65,
-    height: LOGO_SIZE * 0.35,
+  logoImage: {
+    width: LOGO_SIZE * 0.75,
+    height: LOGO_SIZE * 0.75,
     borderRadius: LOGO_SIZE * 0.15,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    transform: [{ rotate: '-15deg' }],
-  },
-
-  /* Icon cluster */
-  iconCluster: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gridIcon: {
-    position: 'absolute',
-    top: -8,
-    left: -12,
-    opacity: 0.9,
-  },
-  excelBadge: {
-    position: 'absolute',
-    bottom: -6,
-    right: -10,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: { elevation: 4 },
-    }),
   },
 
   /* Title */

@@ -6,7 +6,7 @@
  * numbers, to prevent scientific notation (e.g. 9.1915E+11) corruption.
  */
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import XLSX from 'xlsx';
 import type { PhoneContact, ExportFormat, ExportOptions, BackupRecord } from '../types';

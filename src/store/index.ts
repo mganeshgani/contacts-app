@@ -48,6 +48,9 @@ interface ContactsState {
   /** Cancel token for imports */
   cancelToken: { cancelled: boolean };
 
+  /** Optional postfix to append to all contact names during import */
+  namePostfix: string;
+
   /** Loading states */
   isParsingFile: boolean;
   isLoadingDeviceContacts: boolean;
@@ -67,6 +70,7 @@ interface ContactsState {
   updateContact: (contactId: string, updates: Partial<ContactRow>) => void;
   setImportProgress: (progress: ImportProgress | null) => void;
   setLastImportRecordId: (id: string | null) => void;
+  setNamePostfix: (postfix: string) => void;
   cancelImport: () => void;
   reset: () => void;
 }
@@ -80,6 +84,7 @@ const initialContactsState = {
   importProgress: null,
   lastImportRecordId: null,
   cancelToken: { cancelled: false },
+  namePostfix: '',
   isParsingFile: false,
   isLoadingDeviceContacts: false,
   isCheckingDuplicates: false,
@@ -211,6 +216,10 @@ export const useContactsStore = create<ContactsState>((set, get) => ({
 
   setLastImportRecordId: (id: string | null) => {
     set({ lastImportRecordId: id });
+  },
+
+  setNamePostfix: (postfix: string) => {
+    set({ namePostfix: postfix });
   },
 
   cancelImport: () => {

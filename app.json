@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Smart Contacts: Import & Export Excel/CSV",
-    "slug": "smart-contacts-import-export",
+    "slug": "excel-contact-importer",
     "version": "1.0.0",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -36,7 +36,9 @@
         "android.permission.READ_CONTACTS",
         "android.permission.WRITE_CONTACTS"
       ],
-      "package": "com.smartcontacts.importexport"
+      "package": "com.smartcontacts.importexport",
+      "navigationBarColor": "#FFFFFF",
+      "navigationBarStyle": "dark-content"
     },
     "plugins": [
       "expo-updates",

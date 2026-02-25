@@ -19,6 +19,7 @@ export function useImport(): UseImportReturn {
   const cancelTokenRef = useRef({ cancelled: false });
 
   const contacts = useContactsStore((s) => s.contacts);
+  const namePostfix = useContactsStore((s) => s.namePostfix);
   const setImportProgress = useContactsStore((s) => s.setImportProgress);
   const setLastImportRecordId = useContactsStore((s) => s.setLastImportRecordId);
   const parsedFile = useContactsStore((s) => s.parsedFile);
@@ -43,7 +44,8 @@ export function useImport(): UseImportReturn {
       settings.defaultCountryCode,
       settings.batchSize,
       (p) => setImportProgress(p),
-      cancelTokenRef.current
+      cancelTokenRef.current,
+      namePostfix || undefined
     );
 
     // Create import record
@@ -64,7 +66,7 @@ export function useImport(): UseImportReturn {
     setLastImportRecordId(record.id);
 
     return record;
-  }, [contacts, settings, parsedFile, setImportProgress, setLastImportRecordId, addRecord]);
+  }, [contacts, settings, parsedFile, namePostfix, setImportProgress, setLastImportRecordId, addRecord]);
 
   const cancelImport = useCallback(() => {
     cancelTokenRef.current.cancelled = true;
